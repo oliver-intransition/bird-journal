@@ -160,7 +160,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-parchment text-bark">
       {/* Header */}
-      <header className="bg-surface border-b border-sand px-6 py-4">
+      <header className="bg-surface border-b border-sand px-6 py-4" style={{borderTop: "6px solid red"}}>
         <div className="mx-auto max-w-2xl flex items-center gap-3">
           <span className="text-xl">🪶</span>
           <div>
