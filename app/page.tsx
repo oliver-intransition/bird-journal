@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 interface Sighting {
   id: string;
@@ -43,6 +43,7 @@ export default function Home() {
 
   // Expanded locations
   const [expandedLocs, setExpandedLocs] = useState<Set<string>>(new Set());
+  const importRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     try {
@@ -76,6 +77,33 @@ export default function Home() {
 
   function deleteSighting(id: string) {
     persist(sightings.filter((s) => s.id !== id));
+  }
+
+  function exportData() {
+    const json = JSON.stringify(sightings, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `field-journal-${today()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported: Sighting[] = JSON.parse(reader.result as string);
+        const existingIds = new Set(sightings.map((s) => s.id));
+        const merged = [...sightings, ...imported.filter((s) => !existingIds.has(s.id))];
+        persist(merged);
+      } catch {}
+      if (importRef.current) importRef.current.value = "";
+    };
+    reader.readAsText(file);
   }
 
   const knownSpecies = useMemo(
@@ -169,9 +197,28 @@ export default function Home() {
             </h1>
             <p className="text-xs text-stone">Bird sighting record</p>
           </div>
-          <div className="ml-auto text-right">
-            <p className="text-xl font-light text-moss leading-tight">{allSpecies.length}</p>
-            <p className="text-xs text-stone">species</p>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex gap-2">
+              <button
+                onClick={exportData}
+                disabled={sightings.length === 0}
+                className="text-xs text-stone hover:text-moss transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                Export
+              </button>
+              <span className="text-sand">|</span>
+              <button
+                onClick={() => importRef.current?.click()}
+                className="text-xs text-stone hover:text-moss transition-colors"
+              >
+                Import
+              </button>
+              <input ref={importRef} type="file" accept=".json" onChange={importData} className="sr-only" />
+            </div>
+            <div className="text-right">
+              <p className="text-xl font-light text-moss leading-tight">{allSpecies.length}</p>
+              <p className="text-xs text-stone">species</p>
+            </div>
           </div>
         </div>
       </header>
