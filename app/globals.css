@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-parchment: #f5f2eb;
+  --color-surface: #fdfcf8;
+  --color-bark: #2a2016;
+  --color-moss: #5c7a5f;
+  --color-moss-light: #eaf2eb;
+  --color-stone: #6b5e4a;
+  --color-clay: #b8976a;
+  --color-sand: #e0d9ce;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: #f5f2eb;
+  color: #2a2016;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.4;
+  cursor: pointer;
+}
